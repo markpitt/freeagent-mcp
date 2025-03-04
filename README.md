@@ -1,46 +1,73 @@
 # FreeAgent MCP Server
 
-An MCP server to interact with the FreeAgent API for managing timeslips and timers.
+A Claude MCP (Model Context Protocol) server for managing FreeAgent timeslips and timers. This server allows Claude to interact with your FreeAgent account to track time, manage timers, and handle timeslip operations.
 
-## Setup
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-1. Create a new application in the [FreeAgent Developer Dashboard](https://dev.freeagent.com)
-   - Set the OAuth redirect URL to: `http://localhost:3000/oauth/callback`
+## Features
 
-2. Get your OAuth tokens:
-   ```bash
-   # Set your FreeAgent credentials
-   export FREEAGENT_CLIENT_ID="your_client_id"
-   export FREEAGENT_CLIENT_SECRET="your_client_secret"
+- List and filter timeslips with nested data
+- Create new timeslips
+- Update existing timeslips
+- Start and stop timers
+- Delete timeslips
+- Automatic OAuth token refresh
+- Comprehensive error handling
 
-   # Run the OAuth setup script
-   node scripts/get-oauth-tokens.js
-   ```
+## Prerequisites
 
-3. Add the server to your MCP settings (`c:\Users\markj\AppData\Roaming\Code\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json`):
-   ```json
-   {
-     "mcpServers": {
-       "freeagent": {
-         "command": "node",
-         "args": ["D:/Personal/MCP/freeagent-mcp/build/index.js"],
-         "env": {
-           "FREEAGENT_CLIENT_ID": "your_client_id",
-           "FREEAGENT_CLIENT_SECRET": "your_client_secret", 
-           "FREEAGENT_ACCESS_TOKEN": "your_access_token",
-           "FREEAGENT_REFRESH_TOKEN": "your_refresh_token"
-         },
-         "disabled": false,
-         "autoApprove": []
-       }
-     }
-   }
-   ```
+- Node.js 18+
+- A FreeAgent account with API access
+- OAuth credentials from the [FreeAgent Developer Dashboard](https://dev.freeagent.com)
 
-## Available Tools
+## Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/freeagent-mcp.git
+cd freeagent-mcp
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Get your OAuth tokens:
+```bash
+# Set your FreeAgent credentials
+export FREEAGENT_CLIENT_ID="your_client_id"
+export FREEAGENT_CLIENT_SECRET="your_client_secret"
+
+# Run the OAuth setup script
+node scripts/get-oauth-tokens.js
+```
+
+4. Add the server to your MCP settings (typically in `%APPDATA%/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json`):
+```json
+{
+  "mcpServers": {
+    "freeagent": {
+      "command": "node",
+      "args": ["path/to/freeagent-mcp/build/index.js"],
+      "env": {
+        "FREEAGENT_CLIENT_ID": "your_client_id",
+        "FREEAGENT_CLIENT_SECRET": "your_client_secret", 
+        "FREEAGENT_ACCESS_TOKEN": "your_access_token",
+        "FREEAGENT_REFRESH_TOKEN": "your_refresh_token"
+      },
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}
+```
+
+## Usage
+
+Once configured, Claude can use the following tools:
 
 ### List Timeslips
-List timeslips with optional filtering:
 ```javascript
 {
   "from_date": "2024-01-01",      // Start date (YYYY-MM-DD)
@@ -54,16 +81,7 @@ List timeslips with optional filtering:
 }
 ```
 
-### Get Single Timeslip
-Get details for a specific timeslip:
-```javascript
-{
-  "id": "123" // Timeslip ID
-}
-```
-
 ### Create Timeslip
-Create a new timeslip:
 ```javascript
 {
   "task": "https://api.freeagent.com/v2/tasks/123",
@@ -75,52 +93,45 @@ Create a new timeslip:
 }
 ```
 
-### Update Timeslip
-Update an existing timeslip:
+### Timer Controls
 ```javascript
+// Start timer
 {
-  "id": "123",
-  "hours": "2.5",
-  "comment": "Updated comment"
+  "id": "123"
 }
-```
 
-### Delete Timeslip
-Delete a timeslip:
-```javascript
+// Stop timer
 {
   "id": "123"
 }
 ```
-
-### Start Timer
-Start a timer for a timeslip:
-```javascript
-{
-  "id": "123"
-}
-```
-
-### Stop Timer
-Stop a running timer:
-```javascript
-{
-  "id": "123"
-}
-```
-
-## Error Handling
-- The server includes automatic token refresh when expired
-- Comprehensive error logging
-- Tool responses include error details when failures occur
 
 ## Development
-```bash
-# Install dependencies
-npm install
 
+```bash
 # Build the project
 npm run build
 
-# Watch for changes during development
+# Watch for changes
 npm run watch
+
+# Run tests (when implemented)
+npm test
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -am 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- FreeAgent for their excellent API documentation
+- The Claude team for the MCP SDK
