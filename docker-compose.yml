@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  freeagent-mcp:
+    build: .
+    environment:
+      - NODE_ENV=production
+      - FREEAGENT_CLIENT_ID=${FREEAGENT_CLIENT_ID}
+      - FREEAGENT_CLIENT_SECRET=${FREEAGENT_CLIENT_SECRET}
+      - FREEAGENT_ACCESS_TOKEN=${FREEAGENT_ACCESS_TOKEN}
+      - FREEAGENT_REFRESH_TOKEN=${FREEAGENT_REFRESH_TOKEN}
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped

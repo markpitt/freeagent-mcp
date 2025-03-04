@@ -13,14 +13,18 @@ A Claude MCP (Model Context Protocol) server for managing FreeAgent timeslips an
 - Delete timeslips
 - Automatic OAuth token refresh
 - Comprehensive error handling
+- Docker support
 
 ## Prerequisites
 
-- Node.js 18+
+- Node.js 18+ (for direct Node.js usage)
+- Docker & Docker Compose (for containerized usage)
 - A FreeAgent account with API access
 - OAuth credentials from the [FreeAgent Developer Dashboard](https://dev.freeagent.com)
 
 ## Installation
+
+### Option 1: Direct Node.js Installation
 
 1. Clone the repository:
 ```bash
@@ -43,13 +47,65 @@ export FREEAGENT_CLIENT_SECRET="your_client_secret"
 node scripts/get-oauth-tokens.js
 ```
 
-4. Add the server to your MCP settings (typically in `%APPDATA%/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json`):
+### Option 2: Docker Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/freeagent-mcp.git
+cd freeagent-mcp
+```
+
+2. Create your environment file:
+```bash
+cp .env.example .env
+# Edit .env with your FreeAgent credentials
+```
+
+3. Build and run with Docker Compose:
+```bash
+docker-compose up -d
+```
+
+## Configuration
+
+Add the server to your MCP settings (typically in `%APPDATA%/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json`):
+
+### For Node.js Installation:
 ```json
 {
   "mcpServers": {
     "freeagent": {
       "command": "node",
       "args": ["path/to/freeagent-mcp/build/index.js"],
+      "env": {
+        "FREEAGENT_CLIENT_ID": "your_client_id",
+        "FREEAGENT_CLIENT_SECRET": "your_client_secret", 
+        "FREEAGENT_ACCESS_TOKEN": "your_access_token",
+        "FREEAGENT_REFRESH_TOKEN": "your_refresh_token"
+      },
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}
+```
+
+### For Docker Installation:
+```json
+{
+  "mcpServers": {
+    "freeagent": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e", "FREEAGENT_CLIENT_ID",
+        "-e", "FREEAGENT_CLIENT_SECRET",
+        "-e", "FREEAGENT_ACCESS_TOKEN",
+        "-e", "FREEAGENT_REFRESH_TOKEN",
+        "freeagent-mcp"
+      ],
       "env": {
         "FREEAGENT_CLIENT_ID": "your_client_id",
         "FREEAGENT_CLIENT_SECRET": "your_client_secret", 
@@ -108,6 +164,7 @@ Once configured, Claude can use the following tools:
 
 ## Development
 
+### Node.js Development
 ```bash
 # Build the project
 npm run build
@@ -117,6 +174,15 @@ npm run watch
 
 # Run tests (when implemented)
 npm test
+```
+
+### Docker Development
+```bash
+# Build the Docker image
+docker build -t freeagent-mcp .
+
+# Run with Docker Compose
+docker-compose up --build
 ```
 
 ## Contributing
