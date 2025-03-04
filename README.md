@@ -61,9 +61,9 @@ cp .env.example .env
 # Edit .env with your FreeAgent credentials
 ```
 
-3. Build and run with Docker Compose:
+3. Build Docker image:
 ```bash
-docker-compose up -d
+docker build -t freeagent-mcp .
 ```
 
 ## Configuration
@@ -79,7 +79,7 @@ Add the server to your MCP settings (typically in `%APPDATA%/Code/User/globalSto
       "args": ["path/to/freeagent-mcp/build/index.js"],
       "env": {
         "FREEAGENT_CLIENT_ID": "your_client_id",
-        "FREEAGENT_CLIENT_SECRET": "your_client_secret", 
+        "FREEAGENT_CLIENT_SECRET": "your_client_secret",
         "FREEAGENT_ACCESS_TOKEN": "your_access_token",
         "FREEAGENT_REFRESH_TOKEN": "your_refresh_token"
       },
@@ -108,7 +108,7 @@ Add the server to your MCP settings (typically in `%APPDATA%/Code/User/globalSto
       ],
       "env": {
         "FREEAGENT_CLIENT_ID": "your_client_id",
-        "FREEAGENT_CLIENT_SECRET": "your_client_secret", 
+        "FREEAGENT_CLIENT_SECRET": "your_client_secret",
         "FREEAGENT_ACCESS_TOKEN": "your_access_token",
         "FREEAGENT_REFRESH_TOKEN": "your_refresh_token"
       },
@@ -180,9 +180,6 @@ npm test
 ```bash
 # Build the Docker image
 docker build -t freeagent-mcp .
-
-# Run with Docker Compose
-docker-compose up --build
 ```
 
 ## Contributing

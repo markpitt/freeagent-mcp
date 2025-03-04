@@ -1,24 +1,23 @@
-FROM node:20-slim
+FROM node:20-slim AS builder
 
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
+COPY tsconfig.json ./
+COPY src/ ./src/
 
-# Install dependencies
-RUN npm install --production
-
-# Copy source files
-COPY . .
-
-# Build TypeScript
+RUN npm install
 RUN npm run build
 
-# Set executable permissions for the start script
-RUN chmod +x build/index.js
+FROM node:20-slim AS release
 
-# Set environment variables
+WORKDIR /app
+
+COPY --from=builder /app/build ./build
+COPY --from=builder /app/package*.json ./
+
 ENV NODE_ENV=production
 
-# Run the server
-CMD ["node", "build/index.js"]
+RUN npm ci --ignore-scripts --omit=dev
+
+ENTRYPOINT ["node", "build/index.js"]

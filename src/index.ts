@@ -8,6 +8,7 @@ import {
   McpError,
 } from '@modelcontextprotocol/sdk/types.js';
 import { FreeAgentClient } from './freeagent-client.js';
+import { TimeslipAttributes } from './types.js';
 
 const CLIENT_ID = process.env.FREEAGENT_CLIENT_ID as string;
 const CLIENT_SECRET = process.env.FREEAGENT_CLIENT_SECRET as string;
@@ -16,6 +17,31 @@ const REFRESH_TOKEN = process.env.FREEAGENT_REFRESH_TOKEN as string;
 
 if (!CLIENT_ID || !CLIENT_SECRET || !ACCESS_TOKEN || !REFRESH_TOKEN) {
   throw new Error('Missing required environment variables for FreeAgent authentication');
+}
+
+function validateTimeslipAttributes(data: unknown): TimeslipAttributes {
+  if (typeof data !== 'object' || !data) {
+    throw new Error('Invalid timeslip data: must be an object');
+  }
+
+  const attrs = data as Record<string, unknown>;
+
+  if (typeof attrs.task !== 'string' ||
+    typeof attrs.user !== 'string' ||
+    typeof attrs.project !== 'string' ||
+    typeof attrs.dated_on !== 'string' ||
+    typeof attrs.hours !== 'string') {
+    throw new Error('Invalid timeslip data: missing required fields');
+  }
+
+  return {
+    task: attrs.task,
+    user: attrs.user,
+    project: attrs.project,
+    dated_on: attrs.dated_on,
+    hours: attrs.hours,
+    comment: attrs.comment as string | undefined
+  };
 }
 
 class FreeAgentServer {
@@ -178,7 +204,8 @@ class FreeAgentServer {
           }
 
           case 'create_timeslip': {
-            const timeslip = await this.client.createTimeslip(request.params.arguments);
+            const attributes = validateTimeslipAttributes(request.params.arguments);
+            const timeslip = await this.client.createTimeslip(attributes);
             return {
               content: [{ type: 'text', text: JSON.stringify(timeslip, null, 2) }]
             };
@@ -186,7 +213,16 @@ class FreeAgentServer {
 
           case 'update_timeslip': {
             const { id, ...updates } = request.params.arguments as { id: string } & Record<string, unknown>;
-            const timeslip = await this.client.updateTimeslip(id, updates);
+            // Only include valid update fields
+            const validUpdates: Partial<TimeslipAttributes> = {};
+            if (typeof updates.task === 'string') validUpdates.task = updates.task;
+            if (typeof updates.user === 'string') validUpdates.user = updates.user;
+            if (typeof updates.project === 'string') validUpdates.project = updates.project;
+            if (typeof updates.dated_on === 'string') validUpdates.dated_on = updates.dated_on;
+            if (typeof updates.hours === 'string') validUpdates.hours = updates.hours;
+            if (typeof updates.comment === 'string') validUpdates.comment = updates.comment;
+
+            const timeslip = await this.client.updateTimeslip(id, validUpdates);
             return {
               content: [{ type: 'text', text: JSON.stringify(timeslip, null, 2) }]
             };
